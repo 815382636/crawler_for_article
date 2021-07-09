@@ -2,4 +2,5 @@ venv/
 .idea/
 chromedriver
 *.csv
-__pycache__/
+*.pyc
+*.xlsx
