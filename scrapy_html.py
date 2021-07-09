@@ -42,7 +42,7 @@ class ScrapyMe(object):
     def store_mess(self, content):
         wb = Workbook()
         ws = wb.active
-        ws.append(['title', 'authors', 'cites', 'ab'])
+        ws.append(['title', 'authors', 'cites', 'abstract'])
         for c in content:
             ws.append(c)
         wb.save(f"{self.key_word.replace(' ', '_')}.xlsx")
