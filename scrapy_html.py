@@ -1,12 +1,13 @@
 from selenium import webdriver
 from openpyxl import Workbook
+from translate import translate
 
 
 class ScrapyMe(object):
     def __init__(self, url, key_word):
         chrome_options = webdriver.ChromeOptions()
         # 使用headless无界面浏览器模式
-        chrome_options.add_argument('--headless')
+        # chrome_options.add_argument('--headless')
         chrome_options.add_argument('--disable-gpu')
 
         # 启动浏览器，获取网页源代码
@@ -35,14 +36,19 @@ class ScrapyMe(object):
                 authors = article.find_element_by_xpath('.//div[@class="search-result-authors"]').text
                 cites = article.find_element_by_xpath('.//div[@class="search-result-meta"]').text
                 ab = article.find_element_by_xpath('.//div[@class="search-result-abstract folded"]/div').text
-                wl.append([title, authors, cites, ab])
+                translate_title, translate_ab = None, None
+                if title:
+                    translate_title = translate(title)
+                if ab:
+                    translate_ab = translate(ab)
+                wl.append([title, authors, cites, ab, translate_title, translate_ab])
             self.browser.find_elements_by_xpath('//div[@class="page-selector flexrow"]/a')[-1].click()
         return wl
 
     def store_mess(self, content):
         wb = Workbook()
         ws = wb.active
-        ws.append(['title', 'authors', 'cites', 'abstract'])
+        ws.append(['title', 'authors', 'cites', 'abstract', 'translate_title', 'translate_abstract'])
         for c in content:
             ws.append(c)
         wb.save(f"{self.key_word.replace(' ', '_')}.xlsx")
