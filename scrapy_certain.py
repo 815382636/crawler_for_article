@@ -20,22 +20,40 @@ class ScrapyCe(object):
     def scrapy_mess(self):
         self.browser.get(self.url)
         box = self.browser.find_element_by_xpath('//div[@class="abtract-scrollbox shadowed-box"]')
-        print(box.text)
-        print(self.browser.find_element_by_xpath('//div[@class="abtract-scrollbox shadowed-box"]/a[@class="title_link"]').text)
         time.sleep(3)
-        title = box.find_element_by_xpath('./a[@class="title_link"]').text
-        authors = ''.join([i.text for i in box.find_elements_by_xpath('./div[@class="metadata"]')])
-        cites = box.find_element_by_xpath('./div[@class="flexrow"]').text
-        ab = box.find_element_by_xpath('./div[@class="searchable-text abstract-text"]').text
-        wl = [[title, authors, cites, ab]]
-        for article in self.browser.find_elements_by_xpath('//div[@class="list-group minilist-list"]'):
+        title = self.browser.find_element_by_xpath(
+            '//div[@class="abtract-scrollbox shadowed-box"]/a[@class="title_link"]').text
+        authors = ''.join([i.text for i in self.browser.find_elements_by_xpath(
+            '//div[@class="abtract-scrollbox shadowed-box"]/div[@class="metadata"]')])
+        cites = self.browser.find_element_by_xpath(
+            '//div[@class="abtract-scrollbox shadowed-box"]/div[@class="flexrow"]').text
+        ab = self.browser.find_element_by_xpath(
+            '//div[@class="abtract-scrollbox shadowed-box"]/div[@class="searchable-text abstract-text"]').text
+        translate_title, translate_ab = None, None
+        if title:
+            translate_title = translate(title)
+        if ab:
+            translate_ab = translate(ab)
+        wl = [[title, authors, cites, ab, translate_title, translate_ab]]
+        for article in self.browser.find_elements_by_xpath('//div[@class="list-group minilist-list"]/div'):
             article.click()
-            title = box.find_element_by_xpath('./a[@class="title_link]').text
-            authors = ''.join([i.text for i in box.find_elements_by_xpath('./div[@class="metadata"]')])
-            cites = box.find_element_by_xpath('./div[@class="flexrow"]').text
-            ab = box.find_element_by_xpath('./div[@class="searchable-text abstract-text"]').text
-            wl.append([title, authors, cites, ab])
+            title = self.browser.find_element_by_xpath(
+                '//div[@class="abtract-scrollbox shadowed-box"]/a[@class="title_link"]').text
+            authors = ''.join([i.text for i in self.browser.find_elements_by_xpath(
+                '//div[@class="abtract-scrollbox shadowed-box"]/div[@class="metadata"]')])
+            cites = self.browser.find_element_by_xpath(
+                '//div[@class="abtract-scrollbox shadowed-box"]/div[@class="flexrow"]').text
+            ab = self.browser.find_element_by_xpath(
+                '//div[@class="abtract-scrollbox shadowed-box"]/div[@class="searchable-text abstract-text"]').text
+            translate_title, translate_ab = None, None
+            if title:
+                translate_title = translate(title)
+            if ab:
+                translate_ab = translate(ab)
+            wl.append([title, authors, cites, ab, translate_title, translate_ab])
+
         self.store_mess(wl)
+        print("scrapy success !")
 
     def store_mess(self, content):
         wb = Workbook()
@@ -43,7 +61,7 @@ class ScrapyCe(object):
         ws.append(['title', 'authors', 'cites', 'abstract', 'translate_title', 'translate_abstract'])
         for c in content:
             ws.append(c)
-        wb.save(f"me_re.xlsx")
+        wb.save(f"{self.url.split('/')[-2].strip()}.xlsx")
 
 
 def main():

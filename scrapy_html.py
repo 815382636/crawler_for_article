@@ -26,6 +26,7 @@ class ScrapyMe(object):
         content = self.search_mess()
         # xlsx保存
         self.store_mess(content)
+        print("scrapy success !")
 
     def search_mess(self):
         wl = []
